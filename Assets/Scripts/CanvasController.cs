@@ -16,6 +16,7 @@ public class CanvasController : MonoBehaviour
 
     public bool executing = false;
     public bool autoExecute = false;
+    public bool stumbling = false;
 
     int lastCount = 0;
 
@@ -51,7 +52,7 @@ public class CanvasController : MonoBehaviour
 
     public void ClearMovement() // Clears MovememtDirection list from canvas, playerMovementOrderText and Player. This function is called by the clear button
     {
-        
+        lastCount = 0;
         playerMovement.Clear();
         playerMovementOrderText.GetComponent<Text>().text = "Movements Cleared";
         player.GetComponent<PlayerMovement>().playMoves.Clear();
@@ -71,15 +72,24 @@ public class CanvasController : MonoBehaviour
 
     public void Stumble() // Shows Stumble text for time set in StumbleWaitTime, is called from playerMovement when player can't move
     {
-        StumbleText.SetActive(true);
-        StartCoroutine(StumbleWaitTime());
-        executing = false;
+        if (!stumbling)
+        {
+            stumbling = true;
+            StumbleText.SetActive(true);
+            StartCoroutine(StumbleWaitTime());
+            executing = false;
+            ClearMovement();
+        } else
+        {
+            Debug.Log("Player already stumbling");
+        }
     }
 
     IEnumerator StumbleWaitTime() // Time Stumble text is displayed
     {
         yield return new WaitForSeconds(4f);
         StumbleText.SetActive(false);
+        stumbling = false;
     }
 
     public void AutoMove(bool execute) // Called by the AutoMove toggle button. Sets autoExecute to true or false, and turns on or off the executeButton
